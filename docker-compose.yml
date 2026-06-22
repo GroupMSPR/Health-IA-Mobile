@@ -1,0 +1,16 @@
+services:
+  mobile:
+    container_name: healthai_mobile
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "6000:8081"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development
+      - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
