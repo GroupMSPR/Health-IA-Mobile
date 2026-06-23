@@ -1,9 +1,9 @@
 import { View, Text, StyleSheet } from 'react-native';
 
-export default function ProfileScreen() {
+export default function ExercisesScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Profile (Coming Soon)</Text>
+      <Text style={styles.text}>Exercises (Coming Soon)</Text>
     </View>
   );
 }

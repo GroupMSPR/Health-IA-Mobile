@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Slot, useRouter } from 'expo-router';
+import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -7,16 +8,24 @@ const queryClient = new QueryClient();
 
 export default function RootLayout() {
   const router = useRouter();
-  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    SecureStore.getItemAsync('auth_token').then((token) => {
-      if (!token) router.replace('/(auth)/login');
-      setChecked(true);
-    });
+    const checkAuth = async () => {
+      try {
+        if (Platform.OS === 'web') {
+          return;
+        }
+        const token = await SecureStore.getItemAsync('auth_token');
+        if (!token) {
+          router.replace('/(auth)/login');
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+        router.replace('/(auth)/login');
+      }
+    };
+    checkAuth();
   }, []);
-
-  if (!checked) return null;
 
   return (
     <QueryClientProvider client={queryClient}>
