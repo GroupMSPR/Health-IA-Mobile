@@ -11,7 +11,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     SecureStore.getItemAsync('auth_token').then((token) => {
-      if (!token) router.replace('/(auth)/login');
+      if (!token) router.replace('/login');
       setChecked(true);
     });
   }, []);
