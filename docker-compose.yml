@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "6000:8081"
+      - "6000:6000"
     volumes:
       - .:/app
       - /app/node_modules
@@ -16,4 +16,3 @@ services:
     environment:
       - NODE_ENV=development
       - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
-      - EXPO_HOSTNAME=${EXPO_HOSTNAME}
