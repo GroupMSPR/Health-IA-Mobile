@@ -9,8 +9,11 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+    tty: true
+    stdin_open: true
     env_file:
       - .env
     environment:
       - NODE_ENV=development
       - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
+      - EXPO_HOSTNAME=${EXPO_HOSTNAME}

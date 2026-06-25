@@ -8,8 +8,6 @@ RUN npm install --legacy-peer-deps
 
 COPY . .
 
-ENV CI=1
-
 EXPOSE 8081
 
-CMD ["npx", "expo", "start", "--web"]
+CMD ["npx", "expo", "start", "--host", "lan"]
