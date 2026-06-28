@@ -4,7 +4,6 @@ import DashboardInfoSquared from "../../assets/componants/DashboardInfoSquare"
 import ExerciceVignet from "../../assets/componants/exerciceVignet"
 import { useState } from "react"
 import { LineChart } from "react-native-gifted-charts";
-import { LinearGradient } from "expo-linear-gradient"
 
 const Home = () => {
     const [open, setOpen] = useState(false)
@@ -20,7 +19,7 @@ const Home = () => {
         { label: "Sun", value: 7000, value2: 2300 },
     ];
     return (
-        <ScrollView style={{ flex: 1 }} horizontal={false} showsVerticalScrollIndicator={false}>
+        <ScrollView style={{ flex: 1 }} horizontal={false} showsVerticalScrollIndicator={false} >
             <FullHeader open={open} setOpen={setOpen} />
             <View style={{ backgroundColor: '#f4f4f4', flexDirection: 'column', alignContent: 'center' }}>
 
@@ -46,12 +45,14 @@ const Home = () => {
                         flexDirection: "column",
                         alignItems: "center",
                         borderColor: "#bCbCbC",
+                        borderWidth: 1,
                         backgroundColor: "#fff",
                         borderTopLeftRadius: 24,
                         borderBottomLeftRadius: 24,
                         borderTopRightRadius: 0,
                         borderBottomRightRadius: 0,
                         marginLeft: 8,
+                        marginBottom: 8,
                         padding: 8
                     }}
                 >
@@ -75,7 +76,35 @@ const Home = () => {
                     </ScrollView>
                 </View>
 
-                <View>
+                <View style={{
+                    flexDirection: "column",
+                    alignItems: "center",
+                    borderColor: "#bCbCbC",
+                    borderWidth: 1,
+                    backgroundColor: "#fff",
+                    borderRadius: 24,
+                    margin: 8,
+                    padding: 8
+                }}>
+                    <Text style={{
+                        fontSize: 24,
+                        fontWeight: "700",
+                        color: "#1F2937",
+                        padding: 8
+                    }}>Weekly Progress</Text>
+
+                    <View style={{ flexDirection: "row", marginBottom: 10 }}>
+                        <View style={{ flexDirection: "row", alignItems: "center", marginRight: 20 }}>
+                            <View style={{ width: 12, height: 12, backgroundColor: "#4CAF50", marginRight: 6 }} />
+                            <Text>Steps</Text>
+                        </View>
+
+                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                            <View style={{ width: 12, height: 12, backgroundColor: "#FF9800", marginRight: 6 }} />
+                            <Text>Calories</Text>
+                        </View>
+                    </View>
+
                     <LineChart
                         data={data}
                         data2={data.map(item => ({ value: item.value2 }))}
