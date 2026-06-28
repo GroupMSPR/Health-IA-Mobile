@@ -33,4 +33,6 @@ jobs:
         run: npx tsc --noEmit
 
       - name: ESLint
-        run: npx expo lint
+        run: |
+          npm install --no-save eslint@^9.0.0 eslint-config-expo@~56.0.4
+          npx eslint .
