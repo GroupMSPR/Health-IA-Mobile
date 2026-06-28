@@ -6,9 +6,9 @@ name: CI - Mobile (React Native / Expo)
 
 on:
   push:
-    branches: [master]
+    branches: ["master", "develop"]
   pull_request:
-    branches: [master]
+    branches: ["master", "develop"]
 
 jobs:
   lint-and-typecheck:
