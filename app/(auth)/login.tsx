@@ -56,9 +56,9 @@ export default function LoginScreen() {
       });
 
       if (response.status >= 200 && response.status < 300) {
-        const token = response.data.token;
+        const token = response.data.access_token as string;
         await SecureStore.setItemAsync('auth_token', token);
-        router.replace('/(tabs)/dashboard');
+        router.replace('/(tabs)/home');
       }
     } catch (err: any) {
       if (err.response?.status === 422) {
