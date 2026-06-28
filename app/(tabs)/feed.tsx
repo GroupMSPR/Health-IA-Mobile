@@ -1,6 +1,6 @@
 import { View } from "react-native"
 
-const Profile = () => {
+const Feed = () => {
     
     return (
         <View style={{ flex:1, flexDirection: 'row' }}>
@@ -14,4 +14,4 @@ const Profile = () => {
     )
 }
 
-export default Profile
+export default Feed
