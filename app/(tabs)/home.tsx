@@ -1,6 +1,6 @@
 import { View, Text, ScrollView } from "react-native"
 import { FullHeader } from "../../assets/componants/header"
-import DashboardInfoSquared from "../../assets/componants/DashboardInfoSquare"
+import DashboardInfoSquared from "../../assets/componants/dashboardInfoSquare"
 import ExerciceVignet from "../../assets/componants/exerciceVignet"
 import { useState } from "react"
 import { LineChart } from "react-native-gifted-charts";
