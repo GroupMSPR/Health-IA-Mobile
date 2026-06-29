@@ -64,7 +64,7 @@ export default function LoginScreen() {
     } catch (err: any) {
       if (err.response?.status === 422) {
         setErrors(err.response.data.errors || {});
-        setGlobalError("Entée invalide");
+        setGlobalError("Entrée invalide");
       } else if (err.response?.status === 401) {
         setGlobalError('Identifiants incorrects. Veuillez réessayer.');
       } else if (!err.response) {
