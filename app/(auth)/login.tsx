@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { createContext, useState } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,8 @@ import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import api from '../../lib/api';
 import { router } from "expo-router";
+import { useAuth } from '../../context/authContext';
+
 
 const colors = {
   primary: '#7B3FF2',
@@ -33,10 +35,16 @@ const colors = {
 
 export default function LoginScreen() {
   const router = useRouter();
-  const [formData, setFormData] = useState({ email: '', password: '', remember: false });
   const [loading, setLoading] = useState(false);
   const [globalError, setGlobalError] = useState('');
   const [errors, setErrors] = useState<Record<string, string[]>>({});
+
+  const { login } = useAuth();
+
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
 
   const handleChange = (field: string, value: string | boolean) => {
     setFormData({ ...formData, [field]: value });
@@ -57,6 +65,9 @@ export default function LoginScreen() {
       });
 
       if (response.status >= 200 && response.status < 300) {
+        if (login) {
+          login(response.data.user); 
+        }
         const token = response.data.access_token as string;
         await SecureStore.setItemAsync('auth_token', token);
         router.replace('/(tabs)/home');
