@@ -20,6 +20,7 @@ const DashboardInfoSquared = ({
             backgroundColor:"#fff",
             borderRadius: 24,
             borderWidth: 1,
+            flexBasis: "48%",
             padding: 20,
             margin:5
         }}>
