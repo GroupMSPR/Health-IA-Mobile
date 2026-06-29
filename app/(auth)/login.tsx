@@ -13,6 +13,7 @@ import {
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import api from '../../lib/api';
+import { router } from "expo-router";
 
 const colors = {
   primary: '#7B3FF2',
@@ -56,13 +57,14 @@ export default function LoginScreen() {
       });
 
       if (response.status >= 200 && response.status < 300) {
-        const token = response.data.token;
+        const token = response.data.access_token as string;
         await SecureStore.setItemAsync('auth_token', token);
-        router.replace('/(tabs)/dashboard');
+        router.replace('/(tabs)/home');
       }
     } catch (err: any) {
       if (err.response?.status === 422) {
         setErrors(err.response.data.errors || {});
+        setGlobalError("Entrée invalide");
       } else if (err.response?.status === 401) {
         setGlobalError('Identifiants incorrects. Veuillez réessayer.');
       } else if (!err.response) {
@@ -82,23 +84,66 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+
         <View style={styles.gradientSection}>
           <View style={styles.headerContainer}>
             <View style={styles.logoBox}>
               <Text style={styles.logoIcon}>⚡</Text>
             </View>
-            <Text style={styles.logoText}>Health AI Coach</Text>
+
+            <View>
+              <Text style={styles.logoText}>Health AI Coach</Text>
+              <Text style={styles.subtitle}>Welcome back</Text>
+            </View>
           </View>
         </View>
+
         <View style={styles.formCard}>
           <Text style={styles.label}>Email</Text>
-          <TextInput style={styles.input} placeholder="Email" value={formData.email} onChangeText={(val) => handleChange('email', val)} />
+          <TextInput
+            style={styles.input}
+            placeholder="you@example.com"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={formData.email}
+            onChangeText={(val) => handleChange('email', val)}
+          />
+
           <Text style={styles.label}>Password</Text>
-          <TextInput style={styles.input} placeholder="Password" value={formData.password} onChangeText={(val) => handleChange('password', val)} secureTextEntry />
-          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit} disabled={loading}>
-            <Text style={styles.submitButtonText}>{loading ? 'Connecting...' : 'Login'}</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="••••••••"
+            secureTextEntry
+            value={formData.password}
+            onChangeText={(val) => handleChange('password', val)}
+          />
+
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPress={handleSubmit}
+            disabled={loading}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.submitButtonText}>
+              {loading ? 'Connecting...' : 'Login'}
+            </Text>
           </TouchableOpacity>
+          {globalError ? (
+            <View style={styles.errorBox}>
+              <Text style={styles.errorText}>{globalError}</Text>
+            </View>
+          ) : null}
+          {/* Register link */}
+          <View style={styles.registerContainer}>
+            <Text style={styles.registerText}>Don’t have an account?</Text>
+            <TouchableOpacity onPress={() => router.replace("/(auth)/register")}>
+              <Text style={styles.registerLink}> Register</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -168,58 +213,15 @@ const styles = StyleSheet.create({
     color: colors.white,
     letterSpacing: 0.5,
   },
-  heroSection: {
-    marginBottom: 24,
-  },
-  heroTitle: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: colors.white,
-    marginBottom: 8,
-  },
-  heroSubtitle: {
-    fontSize: 14,
-    color: colors.blue50,
-    marginBottom: 20,
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 16,
-    padding: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
-  },
-  statValue: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.white,
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 10,
-    color: colors.blue50,
-    fontWeight: '500',
-  },
-  featuresContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
   featureItem: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 12,
   },
-  featureItem_last: {
-    marginBottom: 0,
+  subtitle: {
+    marginTop: 6,
+    fontSize: 14,
+    opacity: 0.6,
   },
   featureCheckBox: {
     width: 24,
@@ -254,22 +256,6 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 5,
   },
-  errorAlert: {
-    backgroundColor: colors.red50,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.red600,
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  errorText: {
-    fontSize: 13,
-    color: colors.red600,
-    fontWeight: '600',
-  },
-  fieldContainer: {
-    marginBottom: 16,
-  },
   label: {
     fontSize: 13,
     fontWeight: '600',
@@ -286,25 +272,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(248, 250, 252, 0.5)',
     color: colors.slate900,
   },
-  inputError: {
-    borderColor: colors.red600,
-    backgroundColor: colors.red50,
-  },
-  fieldError: {
-    fontSize: 12,
-    color: colors.red600,
-    fontWeight: '600',
-    marginTop: 6,
-  },
-  forgotContainer: {
-    marginBottom: 16,
-    alignItems: 'flex-end',
-  },
-  forgotText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.secondary,
-  },
   submitButton: {
     backgroundColor: colors.primary,
     borderRadius: 12,
@@ -319,40 +286,10 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
-  submitButtonDisabled: {
-    opacity: 0.7,
-  },
   submitButtonText: {
     fontSize: 14,
     fontWeight: '700',
     color: colors.white,
-  },
-  loadingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: colors.slate200,
-  },
-  dividerText: {
-    fontSize: 12,
-    color: colors.slate600,
-    fontWeight: '600',
-    marginHorizontal: 12,
-  },
-  socialGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    marginBottom: 16,
   },
   socialButton: {
     flex: 1,
@@ -391,5 +328,18 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: colors.secondary,
+  },
+  errorBox: {
+    backgroundColor: '#FEE2E2',
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#FCA5A5',
+  },
+  errorText: {
+    color: '#B91C1C',
+    fontSize: 13,
+    fontWeight: '600',
   },
 });
