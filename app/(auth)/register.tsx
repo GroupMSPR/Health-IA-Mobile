@@ -26,9 +26,7 @@ export default function RegisterScreen() {
     try {
       const response = await api.post('/api/register', { first_name: formData.first_name, last_name: formData.last_name, email: formData.email, password: formData.password, password_confirmation: formData.password_confirmation, birthdate: formData.birthdate, gender: formData.gender, weight: parseFloat(formData.weight), height: parseInt(formData.height), body_fat_pct: parseFloat(formData.body_fat_pct), physical_activity_level: formData.physical_activity_level, daily_caloric_intake: parseInt(formData.daily_caloric_intake), favorite_exercise_category: formData.favorite_exercise_category });
       if (response.status >= 200 && response.status < 300) {
-        const token = response.data.token;
-        if (Platform.OS !== 'web') await SecureStore.setItemAsync('auth_token', token);
-        router.replace('/(tabs)/dashboard');
+        router.replace('/(auth)/login');
       }
     } catch (err: any) {
       if (err.response?.status === 422) setErrors(err.response.data.errors || {});
@@ -39,7 +37,136 @@ export default function RegisterScreen() {
     }
   };
 
-  return <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}><ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}><View style={styles.gradientSection}><View style={styles.headerContainer}><View style={styles.logoBox}><Text style={styles.logoIcon}>⚡</Text></View><Text style={styles.logoText}>Health AI Coach</Text></View><View style={styles.heroSection}><Text style={styles.heroTitle}>Créer un compte</Text><Text style={styles.heroSubtitle}>Votre profil de santé personnalisé.</Text></View></View><View style={styles.formCard}>{globalError && <View style={styles.errorAlert} accessible={true} accessibilityRole="alert" accessibilityLiveRegion="assertive"><Text style={styles.errorText}>{globalError}</Text></View>}<Text style={styles.sectionTitle}>Identité & Connexion</Text><View style={styles.fieldContainer}><Text style={styles.label}>Prénom</Text><TextInput style={[styles.input, errors.first_name && styles.inputError]} placeholder="Jean" placeholderTextColor={colors.slate600} value={formData.first_name} onChangeText={(val) => handleChange('first_name', val)} editable={!loading} />{errors.first_name && <Text style={styles.fieldError}>{errors.first_name[0]}</Text>}</View><View style={styles.fieldContainer}><Text style={styles.label}>Nom</Text><TextInput style={[styles.input, errors.last_name && styles.inputError]} placeholder="Dupont" placeholderTextColor={colors.slate600} value={formData.last_name} onChangeText={(val) => handleChange('last_name', val)} editable={!loading} />{errors.last_name && <Text style={styles.fieldError}>{errors.last_name[0]}</Text>}</View><View style={styles.fieldContainer}><Text style={styles.label}>Email</Text><TextInput style={[styles.input, errors.email && styles.inputError]} placeholder="alex@example.com" placeholderTextColor={colors.slate600} value={formData.email} onChangeText={(val) => handleChange('email', val)} keyboardType="email-address" autoCapitalize="none" editable={!loading} />{errors.email && <Text style={styles.fieldError}>{errors.email[0]}</Text>}</View><View style={styles.fieldContainer}><Text style={styles.label}>Mot de passe</Text><TextInput style={[styles.input, errors.password && styles.inputError]} placeholder="••••••••" placeholderTextColor={colors.slate600} value={formData.password} onChangeText={(val) => handleChange('password', val)} secureTextEntry editable={!loading} />{errors.password && <Text style={styles.fieldError}>{errors.password[0]}</Text>}</View><View style={styles.fieldContainer}><Text style={styles.label}>Confirmer le mot de passe</Text><TextInput style={[styles.input, errors.password_confirmation && styles.inputError]} placeholder="••••••••" placeholderTextColor={colors.slate600} value={formData.password_confirmation} onChangeText={(val) => handleChange('password_confirmation', val)} secureTextEntry editable={!loading} />{errors.password_confirmation && <Text style={styles.fieldError}>{errors.password_confirmation[0]}</Text>}</View><Text style={styles.sectionTitle}>Métriques de santé</Text><View style={styles.fieldContainer}><Text style={styles.label}>Date de naissance</Text><TextInput style={[styles.input, errors.birthdate && styles.inputError]} placeholder="YYYY-MM-DD" placeholderTextColor={colors.slate600} value={formData.birthdate} onChangeText={(val) => handleChange('birthdate', val)} editable={!loading} />{errors.birthdate && <Text style={styles.fieldError}>{errors.birthdate[0]}</Text>}</View><View style={styles.fieldContainer}><Text style={styles.label}>Genre</Text><View style={[styles.pickerBox, errors.gender && styles.inputError]}><Picker selectedValue={formData.gender} onValueChange={(val) => handleChange('gender', val)} enabled={!loading}><Picker.Item label="Homme" value="Homme" /><Picker.Item label="Femme" value="Femme" /><Picker.Item label="Autres" value="Autres" /></Picker></View>{errors.gender && <Text style={styles.fieldError}>{errors.gender[0]}</Text>}</View><View style={styles.rowContainer}><View style={[styles.fieldContainer, { flex: 1, marginRight: 8 }]}><Text style={styles.label}>Taille (cm)</Text><TextInput style={[styles.input, errors.height && styles.inputError]} placeholder="180" placeholderTextColor={colors.slate600} value={formData.height} onChangeText={(val) => handleChange('height', val)} keyboardType="numeric" editable={!loading} />{errors.height && <Text style={styles.fieldError}>{errors.height[0]}</Text>}</View><View style={[styles.fieldContainer, { flex: 1 }]}><Text style={styles.label}>Poids (kg)</Text><TextInput style={[styles.input, errors.weight && styles.inputError]} placeholder="75.5" placeholderTextColor={colors.slate600} value={formData.weight} onChangeText={(val) => handleChange('weight', val)} keyboardType="decimal-pad" editable={!loading} />{errors.weight && <Text style={styles.fieldError}>{errors.weight[0]}</Text>}</View></View><View style={styles.fieldContainer}><Text style={styles.label}>Masse Grasse (%)</Text><TextInput style={[styles.input, errors.body_fat_pct && styles.inputError]} placeholder="18.5" placeholderTextColor={colors.slate600} value={formData.body_fat_pct} onChangeText={(val) => handleChange('body_fat_pct', val)} keyboardType="decimal-pad" editable={!loading} />{errors.body_fat_pct && <Text style={styles.fieldError}>{errors.body_fat_pct[0]}</Text>}</View><View style={styles.fieldContainer}><Text style={styles.label}>Niveau d'activité</Text><View style={[styles.pickerBox, errors.physical_activity_level && styles.inputError]}><Picker selectedValue={formData.physical_activity_level} onValueChange={(val) => handleChange('physical_activity_level', val)} enabled={!loading}><Picker.Item label="Sédentaire" value="sedentary" /><Picker.Item label="Moyennement Actif" value="moderate" /><Picker.Item label="Actif" value="active" /></Picker></View>{errors.physical_activity_level && <Text style={styles.fieldError}>{errors.physical_activity_level[0]}</Text>}</View><View style={styles.fieldContainer}><Text style={styles.label}>Catégorie d'exercice préférée</Text><View style={[styles.pickerBox, errors.favorite_exercise_category && styles.inputError]}><Picker selectedValue={formData.favorite_exercise_category} onValueChange={(val) => handleChange('favorite_exercise_category', val)} enabled={!loading}><Picker.Item label="Cardio" value="Cardio" /><Picker.Item label="Poids du corps" value="Poids du corps" /><Picker.Item label="Musculation" value="Musculation" /></Picker></View>{errors.favorite_exercise_category && <Text style={styles.fieldError}>{errors.favorite_exercise_category[0]}</Text>}</View><View style={styles.fieldContainer}><Text style={styles.label}>Apport calorique cible (kcal)</Text><TextInput style={[styles.input, errors.daily_caloric_intake && styles.inputError]} placeholder="2000" placeholderTextColor={colors.slate600} value={formData.daily_caloric_intake} onChangeText={(val) => handleChange('daily_caloric_intake', val)} keyboardType="numeric" editable={!loading} />{errors.daily_caloric_intake && <Text style={styles.fieldError}>{errors.daily_caloric_intake[0]}</Text>}</View><TouchableOpacity style={[styles.submitButton, loading && styles.submitButtonDisabled]} onPress={handleSubmit} disabled={loading} accessible={true} accessibilityRole="button" accessibilityLabel={loading ? 'Inscription en cours' : 'Créer mon compte'} accessibilityState={{ disabled: loading, busy: loading }}>{loading ? <View style={styles.loadingContainer}><ActivityIndicator size="small" color={colors.white} /><Text style={styles.submitButtonText}>Inscription en cours...</Text></View> : <Text style={styles.submitButtonText}>Créer mon compte</Text>}</TouchableOpacity><View style={styles.loginContainer}><Text style={styles.loginText}>Déjà un compte? </Text><TouchableOpacity onPress={() => router.push('/login')} accessible={true} accessibilityRole="link"><Text style={styles.loginLink}>Connectez-vous</Text></TouchableOpacity></View></View></ScrollView></KeyboardAvoidingView>;
+  return (<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
+    <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <View style={styles.gradientSection}>
+        <View style={styles.headerContainer}>
+          <View style={styles.logoBox}>
+            <Text style={styles.logoIcon}>⚡</Text>
+          </View>
+          <Text style={styles.logoText}>Health AI Coach</Text>
+        </View>
+        <View style={styles.heroSection}>
+          <Text style={styles.heroTitle}>Créer un compte</Text>
+          <Text style={styles.heroSubtitle}>Votre profil de santé personnalisé.</Text>
+        </View>
+      </View>
+      <View style={styles.formCard}>
+        {globalError &&
+          <View style={styles.errorAlert} accessible={true} accessibilityRole="alert" accessibilityLiveRegion="assertive">
+            <Text style={styles.errorText}>{globalError}</Text>
+          </View>}
+        <Text style={styles.sectionTitle}>Identité & Connexion</Text>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Prénom</Text>
+          <TextInput style={[styles.input, errors.first_name && styles.inputError]} placeholder="Jean" placeholderTextColor={colors.slate600} value={formData.first_name} onChangeText={(val) => handleChange('first_name', val)} editable={!loading} />
+          {errors.first_name &&
+            <Text style={styles.fieldError}>{errors.first_name[0]}</Text>}
+        </View>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Nom</Text>
+          <TextInput style={[styles.input, errors.last_name && styles.inputError]} placeholder="Dupont" placeholderTextColor={colors.slate600} value={formData.last_name} onChangeText={(val) => handleChange('last_name', val)} editable={!loading} />
+          {errors.last_name &&
+            <Text style={styles.fieldError}>{errors.last_name[0]}</Text>}
+        </View>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Email</Text>
+          <TextInput style={[styles.input, errors.email && styles.inputError]} placeholder="alex@example.com" placeholderTextColor={colors.slate600} value={formData.email} onChangeText={(val) => handleChange('email', val)} keyboardType="email-address" autoCapitalize="none" editable={!loading} />
+          {errors.email &&
+            <Text style={styles.fieldError}>{errors.email[0]}</Text>}
+        </View><View style={styles.fieldContainer}>
+          <Text style={styles.label}>Mot de passe</Text>
+          <TextInput style={[styles.input, errors.password && styles.inputError]} placeholder="••••••••" placeholderTextColor={colors.slate600} value={formData.password} onChangeText={(val) => handleChange('password', val)} secureTextEntry editable={!loading} />
+          {errors.password &&
+            <Text style={styles.fieldError}>{errors.password[0]}</Text>}
+        </View>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Confirmer le mot de passe</Text>
+          <TextInput style={[styles.input, errors.password_confirmation && styles.inputError]} placeholder="••••••••" placeholderTextColor={colors.slate600} value={formData.password_confirmation} onChangeText={(val) => handleChange('password_confirmation', val)} secureTextEntry editable={!loading} />
+          {errors.password_confirmation &&
+            <Text style={styles.fieldError}>{errors.password_confirmation[0]}</Text>}
+        </View>
+        <Text style={styles.sectionTitle}>Métriques de santé</Text>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Date de naissance</Text>
+          <TextInput style={[styles.input, errors.birthdate && styles.inputError]} placeholder="YYYY-MM-DD" placeholderTextColor={colors.slate600} value={formData.birthdate} onChangeText={(val) => handleChange('birthdate', val)} editable={!loading} />
+          {errors.birthdate &&
+            <Text style={styles.fieldError}>{errors.birthdate[0]}</Text>}
+        </View>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Genre</Text>
+          <View style={[styles.pickerBox, errors.gender && styles.inputError]}>
+            <Picker selectedValue={formData.gender} onValueChange={(val) => handleChange('gender', val)} enabled={!loading}>
+              <Picker.Item label="Homme" value="Homme" />
+              <Picker.Item label="Femme" value="Femme" />
+              <Picker.Item label="Autres" value="Autres" />
+            </Picker>
+          </View>
+          {errors.gender &&
+            <Text style={styles.fieldError}>{errors.gender[0]}</Text>}
+        </View><View style={styles.rowContainer}>
+          <View style={[styles.fieldContainer, { flex: 1, marginRight: 8 }]}>
+            <Text style={styles.label}>Taille (cm)</Text>
+            <TextInput style={[styles.input, errors.height && styles.inputError]} placeholder="180" placeholderTextColor={colors.slate600} value={formData.height} onChangeText={(val) => handleChange('height', val)} keyboardType="numeric" editable={!loading} />
+            {errors.height &&
+              <Text style={styles.fieldError}>{errors.height[0]}</Text>}
+          </View>
+          <View style={[styles.fieldContainer, { flex: 1 }]}>
+            <Text style={styles.label}>Poids (kg)</Text>
+            <TextInput style={[styles.input, errors.weight && styles.inputError]} placeholder="75.5" placeholderTextColor={colors.slate600} value={formData.weight} onChangeText={(val) => handleChange('weight', val)} keyboardType="decimal-pad" editable={!loading} />
+            {errors.weight &&
+              <Text style={styles.fieldError}>{errors.weight[0]}</Text>}
+          </View>
+        </View>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Masse Grasse (%)</Text>
+          <TextInput style={[styles.input, errors.body_fat_pct && styles.inputError]} placeholder="18.5" placeholderTextColor={colors.slate600} value={formData.body_fat_pct} onChangeText={(val) => handleChange('body_fat_pct', val)} keyboardType="decimal-pad" editable={!loading} />
+          {errors.body_fat_pct &&
+            <Text style={styles.fieldError}>{errors.body_fat_pct[0]}</Text>}
+        </View>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Niveau d'activité</Text>
+          <View style={[styles.pickerBox, errors.physical_activity_level && styles.inputError]}>
+            <Picker selectedValue={formData.physical_activity_level} onValueChange={(val) => handleChange('physical_activity_level', val)} enabled={!loading}>
+              <Picker.Item label="Sédentaire" value="sedentary" />
+              <Picker.Item label="Moyennement Actif" value="moderate" />
+              <Picker.Item label="Actif" value="active" /></Picker>
+          </View>{errors.physical_activity_level &&
+            <Text style={styles.fieldError}>{errors.physical_activity_level[0]}</Text>}
+        </View>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Catégorie d'exercice préférée</Text>
+          <View style={[styles.pickerBox, errors.favorite_exercise_category && styles.inputError]}>
+            <Picker selectedValue={formData.favorite_exercise_category} onValueChange={(val) => handleChange('favorite_exercise_category', val)} enabled={!loading}>
+              <Picker.Item label="Cardio" value="Cardio" />
+              <Picker.Item label="Poids du corps" value="Poids du corps" />
+              <Picker.Item label="Musculation" value="Musculation" />
+            </Picker>
+          </View>{errors.favorite_exercise_category &&
+            <Text style={styles.fieldError}>{errors.favorite_exercise_category[0]}</Text>}
+        </View>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Apport calorique cible (kcal)</Text>
+          <TextInput style={[styles.input, errors.daily_caloric_intake && styles.inputError]} placeholder="2000" placeholderTextColor={colors.slate600} value={formData.daily_caloric_intake} onChangeText={(val) => handleChange('daily_caloric_intake', val)} keyboardType="numeric" editable={!loading} />
+          {errors.daily_caloric_intake &&
+            <Text style={styles.fieldError}>{errors.daily_caloric_intake[0]}</Text>}
+        </View>
+        <TouchableOpacity style={[styles.submitButton, loading && styles.submitButtonDisabled]} onPress={handleSubmit} disabled={loading} accessible={true} accessibilityRole="button" accessibilityLabel={loading ? 'Inscription en cours' : 'Créer mon compte'} accessibilityState={{ disabled: loading, busy: loading }}>
+          {loading ?
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="small" color={colors.white} />
+              <Text style={styles.submitButtonText}>Inscription en cours...</Text>
+            </View> : <Text style={styles.submitButtonText}>Créer mon compte</Text>}
+        </TouchableOpacity>
+        <View style={styles.loginContainer}>
+          <Text style={styles.loginText}>Déjà un compte? </Text>
+          <TouchableOpacity onPress={() => router.push('/login')} accessible={true} accessibilityRole="link">
+            <Text style={styles.loginLink}>Connectez-vous</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </ScrollView>
+  </KeyboardAvoidingView>);
 }
 
 const styles = StyleSheet.create({
