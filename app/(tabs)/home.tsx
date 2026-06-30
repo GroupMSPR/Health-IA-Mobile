@@ -25,22 +25,33 @@ interface Exercise {
     difficulty_level: string;
     target_muscle: string;
     recommended_duration_seconds: number;
-    ai_confidence?: number; 
+    ai_confidence?: number;
+    estimated_calories_per_minutes: number;
+    rep_range_min: number;
 }
 
 const Home = () => {
     const [open, setOpen] = useState(false)
-    const [needsOnboarding, setNeedsOnboarding] = useState(false);
-    const [availableGoals, setAvailableGoals] = useState<any[]>([]);
-    const [availableConstraints, setAvailableConstraints] = useState<any[]>([]);
-    const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
-    const [selectedConstraints, setSelectedConstraints] = useState<string[]>([]);
-    const [isSavingOnboarding, setIsSavingOnboarding] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [isRecomendationLoading, setIsRecomendationLoading] = useState(true)
 
     const [recommendations, setRecommendations] = useState<Exercise[]>([]);
-    const [error, setError] = useState<string | null>(null);
 
+    const difficultyColors: Record<string, string> = {
+        Beginner: "#4a25f0",
+        Intermediate: "#d8a200",
+        Advanced: "#b10000",
+    };
+
+    function formatDuration(totalSeconds: number) {
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+
+        const minPart = `${minutes}min`;
+        const secPart = seconds > 0 ? ` ${seconds.toString().padStart(2, "0")}s` : "";
+
+        return minPart + secPart;
+    }
 
     const [weeklyData, setWeeklyData] = useState({
         totalMinutes: 0,
@@ -52,8 +63,24 @@ const Home = () => {
         stepChange: { text: '--', type: 'neutral' },
         weightChange: { text: '--', type: 'neutral' },
         chartLabels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
-        chartCalories: [0, 0, 0, 0, 0, 0, 0],
-        chartSteps: [0, 0, 0, 0, 0, 0, 0]
+        chartCalories: [
+            { value: 0, label: 'mer.' },
+            { value: 0, label: 'jeu.' },
+            { value: 0, label: 'ven.' },
+            { value: 0, label: 'sam.' },
+            { value: 0, label: 'dim.' },
+            { value: 0, label: 'lun.' },
+            { value: 0, label: 'mar.' },
+        ],
+        chartSteps: [
+            { value: 0, label: 'mer.' },
+            { value: 0, label: 'jeu.' },
+            { value: 0, label: 'ven.' },
+            { value: 0, label: 'sam.' },
+            { value: 0, label: 'dim.' },
+            { value: 0, label: 'lun.' },
+            { value: 0, label: 'mar.' },
+        ],
     });
 
     const data = [
@@ -69,114 +96,112 @@ const Home = () => {
     const { user } = useAuth();
 
     const fetchRecommendations = async () => {
-    if (!user) return;
+        if (!user) return;
 
-    try {
-        // BMI
-        let calculatedBmi = user.bmi;
+        setIsRecomendationLoading(true);
 
-        if (!calculatedBmi && user.weight && user.height) {
-            calculatedBmi =
-                Number(user.weight) /
-                Math.pow(Number(user.height) / 100, 2);
-        }
+        try {
+            // BMI
+            let calculatedBmi = user.bmi;
 
-        // Age
-        let age = 25;
-
-        if (user.birthdate) {
-            const birth = new Date(user.birthdate);
-            const today = new Date();
-
-            age = today.getFullYear() - birth.getFullYear();
-
-            const m = today.getMonth() - birth.getMonth();
-
-            if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
-                age--;
+            if (!calculatedBmi && user.weight && user.height) {
+                calculatedBmi =
+                    Number(user.weight) /
+                    Math.pow(Number(user.height) / 100, 2);
             }
-        }
 
-        const aiPayload = {
-            age,
-            bmi: parseFloat((Number(calculatedBmi) || 22).toFixed(1)),
-            physical_activity_level:
-                user.physical_activity_level || "moderate",
-            favorite_exercise_category:
-                user.favorite_exercise_category || "Cardio",
-        };
+            // Age
+            let age = 25;
 
-        // AI prediction
-        console.log("ai prediction")
-        const aiResponse = await api.post("/api/ai/recommend", aiPayload);
+            if (user.birthdate) {
+                const birth = new Date(user.birthdate);
+                const today = new Date();
 
-        console.log(aiResponse)
+                age = today.getFullYear() - birth.getFullYear();
 
-        const predictions =
-            aiResponse.data?.predictions ||
-            aiResponse.data?.data?.predictions ||
-            [];
+                const m = today.getMonth() - birth.getMonth();
 
-        if (!Array.isArray(predictions) || predictions.length === 0) {
-            setRecommendations([]);
-            return;
-        }
+                if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+                    age--;
+                }
+            }
 
-        const top5 = predictions.slice(0, 5);
+            const aiPayload = {
+                age,
+                bmi: parseFloat((Number(calculatedBmi) || 22).toFixed(1)),
+                physical_activity_level:
+                    user.physical_activity_level || "moderate",
+                favorite_exercise_category:
+                    user.favorite_exercise_category || "Cardio",
+            };
 
-        const exerciseNames = top5.map((p: any) => p.exercise);
+            const aiResponse = await api.post("/api/ai/recommend", aiPayload);
 
-        // Fetch exercise details
-        console.log("fetch exercise details")
-        let dbExercises: any[] = [];
+            const predictions =
+                aiResponse.data?.predictions ||
+                aiResponse.data?.data?.predictions ||
+                [];
 
-        if (exerciseNames.length) {
-            const dbResponse = await api.post("/api/exercises/search", {
-                search: {
-                    filters: [
-                        {
-                            field: "name",
-                            operator: "in",
-                            value: exerciseNames,
-                        },
-                    ],
-                },
+            if (!Array.isArray(predictions) || predictions.length === 0) {
+                setRecommendations([]);
+                return;
+            }
+
+            const top5 = predictions.slice(0, 5);
+
+            const exerciseNames = top5.map((p: any) => p.exercise);
+
+            // Fetch exercise details
+            let dbExercises: any[] = [];
+
+            if (exerciseNames.length) {
+                const dbResponse = await api.post("/api/exercises/search", {
+                    search: {
+                        filters: [
+                            {
+                                field: "name",
+                                operator: "in",
+                                value: exerciseNames,
+                            },
+                        ],
+                    },
+                });
+                dbExercises = dbResponse.data?.data || dbResponse.data || [];
+            }
+
+            // Merge AI + DB
+            const merged = top5.map((prediction: any) => {
+                const exercise = dbExercises.find(
+                    (e: any) =>
+                        e?.name?.toLowerCase() ===
+                        prediction.exercise?.toLowerCase()
+                );
+
+                if (exercise) {
+                    return {
+                        ...exercise,
+                        ai_confidence: prediction.confidence,
+                    };
+                }
+
+                return;
             });
-            console.log(dbResponse)
-            dbExercises = dbResponse.data?.data || dbResponse.data || [];
+
+            const cleaned = merged.filter(item => item != null);
+
+            setRecommendations(cleaned);
+            setIsRecomendationLoading(false);
+        } catch (err) {
+            console.error(err);
         }
-
-        // Merge AI + DB
-        const merged = top5.map((prediction: any) => {
-            const exercise = dbExercises.find(
-                (e: any) =>
-                    e?.name?.toLowerCase() ===
-                    prediction.exercise?.toLowerCase()
-            );
-
-            if (exercise) {
-                return {
-                    ...exercise,
-                    ai_confidence: prediction.confidence,
-                };
-            }
-
-            return null;
-        });
-
-        console.log(merged)
-        setRecommendations(merged);
-    } catch (err) {
-        console.error(err);
-    }
-};
+    };
 
     useEffect(() => {
         if (!user) return;
 
         const fetchData = async () => {
             try {
-                // 1. VÉRIFICATION DE L'ONBOARDING (L'utilisateur a-t-il des objectifs ?)
+
                 const userRes = await api.post('/api/users/search', {
                     search: {
                         filters: [{ field: 'id', operator: '=', value: user.id }],
@@ -230,6 +255,18 @@ const Home = () => {
                     return m?.active_minute ? Number(m.active_minute) : 0;
                 });
 
+                const stepChartData = stpData.map((value, i) => ({
+                    value,
+                    label: dayNames[i],
+                }));
+
+                const calChartData = calData.map((value, i) => ({
+                    value,
+                    label: dayNames[i],
+                }));
+
+                console.log(calData, stpData, dayNames)
+
                 // Calcul des totaux
                 const totalCal = calData.reduce((a, b) => a + b, 0);
                 const totalMin = minData.reduce((a, b) => a + b, 0);
@@ -270,9 +307,11 @@ const Home = () => {
                     stepChange: getChange(stpData[6], stpData[5]),
                     weightChange: weightChange,
                     chartLabels: dayNames,
-                    chartCalories: calData,
-                    chartSteps: stpData
+                    chartCalories: calChartData,
+                    chartSteps: stepChartData
                 });
+
+                console.log(weeklyData)
 
                 weeklyData.totalMinutes.toString()
 
@@ -343,11 +382,20 @@ const Home = () => {
                     </Text>
 
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 24 }}>
-                        <ExerciceVignet title={"Barbell Squat"} difficulty={"Intermediate"} difficultyColor={"#00f"} duration={"45min"} caloriesBurntEstimate={"320"} reps={"4x8-12"} id={"187870d8-1fc8-4097-a7df-02dde1792e01"} />
-                        <ExerciceVignet title={"Barbell Squat"} difficulty={"Intermediate"} difficultyColor={"#00f"} duration={"45min"} caloriesBurntEstimate={"320"} reps={"4x8-12"} id={"187870d8-1fc8-4097-a7df-02dde1792e01"} />
-                        <ExerciceVignet title={"Barbell Squat"} difficulty={"Intermediate"} difficultyColor={"#00f"} duration={"45min"} caloriesBurntEstimate={"320"} reps={"4x8-12"} id={"187870d8-1fc8-4097-a7df-02dde1792e01"} />
-                        <ExerciceVignet title={"Barbell Squat"} difficulty={"Intermediate"} difficultyColor={"#00f"} duration={"45min"} caloriesBurntEstimate={"320"} reps={"4x8-12"} id={"187870d8-1fc8-4097-a7df-02dde1792e01"} />
-                        <ExerciceVignet title={"Barbell Squat"} difficulty={"Intermediate"} difficultyColor={"#00f"} duration={"45min"} caloriesBurntEstimate={"320"} reps={"4x8-12"} id={"187870d8-1fc8-4097-a7df-02dde1792e01"} />
+                        {!recommendations || recommendations.length === 0 ? (
+                            <Text>{isRecomendationLoading ? "loading" : "no exercise fits your condition, consider resting"}</Text>
+                        ) : (recommendations.map((ex) => (
+                            <ExerciceVignet
+                                key={ex.id}
+                                title={ex.name}
+                                difficulty={ex.difficulty_level}
+                                difficultyColor={difficultyColors[ex.difficulty_level] ?? "gray"}
+                                duration={formatDuration(ex.recommended_duration_seconds)}
+                                caloriesBurntEstimate={(ex.estimated_calories_per_minutes * ex.recommended_duration_seconds / 60).toString()}
+                                reps={ex.rep_range_min.toString()}
+                                id={ex.id}
+                            />
+                        )))}
                     </ScrollView>
                 </View>
 
@@ -381,8 +429,8 @@ const Home = () => {
                     </View>
 
                     <LineChart
-                        data={data}
-                        data2={data.map(item => ({ value: item.value2 }))}
+                        data={weeklyData.chartSteps}
+                        data2={weeklyData.chartCalories}
 
                         curved
                         thickness={3}
