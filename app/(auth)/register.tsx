@@ -11,8 +11,8 @@ export default function RegisterScreen() {
   const router = useRouter();
   const [formData, setFormData] = useState({ first_name: '', last_name: '', email: '', password: '', password_confirmation: '', birthdate: '', gender: 'Femme', weight: '', height: '', body_fat_pct: '', physical_activity_level: 'active', daily_caloric_intake: '2000', favorite_exercise_category: 'Cardio' });
   const [loading, setLoading] = useState(false);
-  const [globalError, setGlobalError] = useState('');
   const [errors, setErrors] = useState<Record<string, string[]>>({});
+  const [globalError, setGlobalError] = useState('');
 
   const handleChange = (field: string, value: string) => {
     setFormData({ ...formData, [field]: value });
