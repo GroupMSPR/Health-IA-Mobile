@@ -11,4 +11,24 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
+let onUnauthorized: (() => void) | null = null;
+
+export const setUnauthorizedHandler = (handler: () => void) => {
+  onUnauthorized = handler;
+};
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      await SecureStore.deleteItemAsync('auth_token');
+
+      if (onUnauthorized) {
+        onUnauthorized();
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;
