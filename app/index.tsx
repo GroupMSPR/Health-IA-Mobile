@@ -2,23 +2,20 @@ import { useEffect, useState } from 'react';
 import { Redirect, Slot, useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { View, Text } from 'react-native';
+import { useAuth } from '../context/authContext';
 
 export default function RootLayout() {
-  const [token, setToken] = useState<string | null | undefined>(undefined);
+  const { isAuthenticated, isLoading } = useAuth();
 
-  useEffect(() => {
-    SecureStore.getItemAsync('auth_token').then(setToken);
-  }, []);
-
-  if (token === undefined) {
+  if (isLoading) {
     return (
       <View>
-        <Text>loading ...</Text>
+        <Text>Loading...</Text>
       </View>
     );
   }
 
-  if (!token){
+  if (!isAuthenticated){
     return <Redirect href="/(auth)/login"/>;
   }
 
