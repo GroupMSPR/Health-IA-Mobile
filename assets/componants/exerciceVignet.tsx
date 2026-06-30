@@ -22,7 +22,7 @@ const ExerciseVignette = ({
 }: ExerciseVignetteProps) => {
   return (
     <Pressable
-      onPress={() => router.replace(`/(tabs)/exercise/${id}`)}
+      onPress={() => router.push(`/(tabs)/exercises/detail/${id}`)}
       style={styles.card}
     >
       <Text style={styles.title}>{title}</Text>
