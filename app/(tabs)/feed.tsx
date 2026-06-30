@@ -1,16 +1,10 @@
 import { View } from "react-native"
+import UnderConstructionScreen from "../../assets/componants/wip"
 
 const Feed = () => {
     
     return (
-        <View style={{ flex:1, flexDirection: 'row' }}>
-            <View style={{ flex:2, backgroundColor: 'red' }}>
-
-            </View>
-            <View style={{ flex:8, backgroundColor: 'green' }}>
-
-            </View>
-        </View>
+        <UnderConstructionScreen/>
     )
 }
 

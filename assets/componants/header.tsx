@@ -41,7 +41,7 @@ export const NavigationSidebar = ({
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
     const translateX = open ? 0 : -SCREEN_WIDTH * 0.75;
-    
+
 
     return (
         <>
@@ -75,13 +75,16 @@ export const NavigationSidebar = ({
             >
                 <Text style={{ fontSize: 20, marginBottom: 20 }}>Menu</Text>
 
-                <Text style={{ marginBottom: 15 }}>🏠 Home</Text>
+                <Pressable onPress={() => router.replace("/(tabs)/home")}>
+                    <Text style={{ marginBottom: 15 }}>🏠 Home</Text>
+                </Pressable>
                 <Pressable onPress={() => router.replace("/(tabs)/feed")}>
                     <Text style={{ marginBottom: 15 }}>🧠 AI Coach</Text>
                 </Pressable>
-                <Text style={{ marginBottom: 15 }}>➕ Create</Text>
+                <Pressable onPress={() => router.replace("/(tabs)/profile")}>
                 <Text style={{ marginBottom: 15 }}>👤 Profile</Text>
-            </Animated.View>
+                </Pressable>
+            </Animated.View >
         </>
     );
 };
@@ -96,7 +99,7 @@ export const FullHeader = ({
     return (
         <>
             <NavigatorHeader setOpen={setOpen} />
-            <NavigationSidebar open={open} setOpen={setOpen} /> 
+            <NavigationSidebar open={open} setOpen={setOpen} />
         </>
     )
 }
