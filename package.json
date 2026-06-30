@@ -30,6 +30,7 @@
   "devDependencies": {
     "@testing-library/jest-native": "^5.4.3",
     "@types/jest": "^30.0.0",
+    "@types/node": "^26.0.1",
     "@types/react": "~19.1.10",
     "test-renderer": "^1.2.0",
     "typescript": "~5.9.2"
