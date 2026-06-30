@@ -1,15 +1,11 @@
-// Index.test.tsx
-import React from 'react';
 import { render, screen } from '@testing-library/react-native';
 import Index from '../app/index';
 import { useAuth } from '../context/authContext';
 
-// Mock du hook d'authentification (présence du token = isAuthenticated)
 jest.mock('../context/authContext', () => ({
   useAuth: jest.fn(),
 }));
 
-// Mock d'expo-router pour inspecter la cible du Redirect
 jest.mock('expo-router', () => {
   const { Text } = require('react-native');
   return {
@@ -21,12 +17,12 @@ jest.mock('expo-router', () => {
 
 const mockUseAuth = useAuth as jest.Mock;
 
-describe('Index (redirection selon le token)', () => {
+describe('Index (redirect based on token)', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('redirige vers home quand le token est présent', async () => {
+  it('redirect to home when there is a token', async () => {
     mockUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false });
 
     await render(<Index />);
@@ -34,7 +30,7 @@ describe('Index (redirection selon le token)', () => {
     expect(screen.getByTestId('redirect')).toHaveTextContent('/(tabs)/home');
   });
 
-  it("redirige vers auth/login quand il n'y a pas de token", async () => {
+  it("redirect to auth when there isn't a token ", async () => {
     mockUseAuth.mockReturnValue({ isAuthenticated: false, isLoading: false });
 
     await render(<Index />);
