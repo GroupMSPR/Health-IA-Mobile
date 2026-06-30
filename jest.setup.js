@@ -1,7 +1,10 @@
-import "react-native-gesture-handler/jestSetup";
+import "@testing-library/jest-native/extend-expect";
+// import "react-native-gesture-handler/jestSetup";
 
-jest.mock("expo-secure-store", () => ({
-  getItemAsync: jest.fn(),
-  setItemAsync: jest.fn(),
-  deleteItemAsync: jest.fn(),
-}));
+console.log("✅ Jest setup file loaded");
+
+// jest.mock("expo-secure-store", () => ({
+//   getItemAsync: jest.fn(),
+//   setItemAsync: jest.fn(),
+//   deleteItemAsync: jest.fn(),
+// }));
