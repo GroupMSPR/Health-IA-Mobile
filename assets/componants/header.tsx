@@ -79,7 +79,7 @@ export const NavigationSidebar = ({
                     <Text style={{ marginBottom: 15 }}>🏠 Home</Text>
                 </Pressable>
                 <Pressable onPress={() => router.replace("/(tabs)/feed")}>
-                    <Text style={{ marginBottom: 15 }}>🧠 AI Coach</Text>
+                    <Text style={{ marginBottom: 15 }}>🧠 Community</Text>
                 </Pressable>
                 <Pressable onPress={() => router.replace("/(tabs)/profile")}>
                 <Text style={{ marginBottom: 15 }}>👤 Profile</Text>

@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 6000
 
-CMD ["npx", "expo", "start", "--port", "6000", "--tunnel"]
+CMD ["npx", "expo", "start", "--port", "6000", "--tunnel", "--clear"]
