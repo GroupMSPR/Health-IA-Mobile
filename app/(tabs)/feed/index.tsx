@@ -7,6 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { router } from "expo-router"
 import { useAuth } from "../../../context/authContext"
 import { MOCK_POSTS, CATEGORY_BADGE, type Post } from "./data"
+import { FullHeader } from "../../../assets/componants/header"
 
 type FilterTab = "All" | "Workouts" | "Nutrition" | "Milestones"
 const TABS: FilterTab[] = ["All", "Workouts", "Nutrition", "Milestones"]
@@ -16,6 +17,7 @@ export default function Feed() {
     const [activeTab, setActiveTab] = useState<FilterTab>("All")
     const [search, setSearch] = useState("")
     const [posts, setPosts] = useState<Post[]>(MOCK_POSTS)
+    const [open, setOpen] = useState(false)
 
     const memberCount = 247
 
@@ -44,6 +46,7 @@ export default function Feed() {
 
     return (
         <SafeAreaView style={styles.safe}>
+            <FullHeader open={open} setOpen={setOpen} />
             <StatusBar barStyle="dark-content" />
             <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
 
