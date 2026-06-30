@@ -161,9 +161,6 @@ export default function PostDetail() {
                                 <Text style={styles.commentContent}>{comment.content}</Text>
                                 <View style={styles.commentActions}>
                                     <Pressable>
-                                        <Text style={styles.commentAction}>{comment.likes} Likes</Text>
-                                    </Pressable>
-                                    <Pressable>
                                         <Text style={styles.commentAction}>Reply</Text>
                                     </Pressable>
                                 </View>
