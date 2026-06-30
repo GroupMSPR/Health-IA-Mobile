@@ -1,13 +1,17 @@
-import { render } from "@testing-library/react-native";
-import LoginScreen from "../app/index";
+import { render, screen } from "@testing-library/react-native";
+import RootLayout from "../app/index";
 
-jest.mock("expo-router", () => ({
-  useRouter: () => ({
-    push: jest.fn(),
-  }),
+jest.mock("../context/authContext", () => ({
+  useAuth: () => ({ isAuthenticated: false, isLoading: true }),
 }));
 
-test("renders login screen", () => {
-  const { getByText } = render(<LoginScreen />);
-  expect(getByText("Login")).toBeTruthy();
+jest.mock("expo-router", () => ({
+  Redirect: () => null,
+  Slot: () => null,
+  useRouter: () => ({ push: jest.fn() }),
+}));
+
+test("affiche l'écran de chargement quand l'auth est en cours", async () => {
+  await render(<RootLayout />);
+  expect(await screen.findByText("Loading...")).toBeTruthy();
 });
