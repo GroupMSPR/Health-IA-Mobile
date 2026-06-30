@@ -1,15 +1,15 @@
-// RootLayout.test.tsx
+// Index.test.tsx
 import React from 'react';
 import { render, screen } from '@testing-library/react-native';
-import RootLayout from '../app/_layout'; 
+import Index from '../app/index';
 import { useAuth } from '../context/authContext';
 
-// Mock the auth hook
+// Mock du hook d'authentification (présence du token = isAuthenticated)
 jest.mock('../context/authContext', () => ({
   useAuth: jest.fn(),
 }));
 
-// Mock expo-router so we can inspect what Redirect/Slot receive
+// Mock d'expo-router pour inspecter la cible du Redirect
 jest.mock('expo-router', () => {
   const { Text } = require('react-native');
   return {
@@ -21,32 +21,24 @@ jest.mock('expo-router', () => {
 
 const mockUseAuth = useAuth as jest.Mock;
 
-describe('RootLayout', () => {
+describe('Index (redirection selon le token)', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('shows loading state while auth is resolving', () => {
-    mockUseAuth.mockReturnValue({ isAuthenticated: false, isLoading: true });
-
-    render(<RootLayout />);
-
-    expect(screen.getByText('Loading...')).toBeTruthy();
-  });
-
-  it('redirects to login when not authenticated', () => {
-    mockUseAuth.mockReturnValue({ isAuthenticated: false, isLoading: false });
-
-    render(<RootLayout />);
-
-    expect(screen.getByTestId('redirect')).toHaveTextContent('/(auth)/login');
-  });
-
-  it('redirects to home when authenticated', () => {
+  it('redirige vers home quand le token est présent', async () => {
     mockUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false });
 
-    render(<RootLayout />);
+    await render(<Index />);
 
     expect(screen.getByTestId('redirect')).toHaveTextContent('/(tabs)/home');
+  });
+
+  it("redirige vers auth/login quand il n'y a pas de token", async () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: false, isLoading: false });
+
+    await render(<Index />);
+
+    expect(screen.getByTestId('redirect')).toHaveTextContent('/(auth)/login');
   });
 });
