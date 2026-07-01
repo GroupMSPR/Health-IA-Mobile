@@ -1,13 +1,28 @@
-export type PostCategory = "Workout" | "Nutrition" | "Milestone"
-
-export interface Comment {
+export interface ApiUser {
     id: string
-    author: string
-    initials: string
-    avatarColor: string
-    timeAgo: string
+    first_name: string
+    last_name: string
+    avatar?: string | null
+}
+
+export interface ApiComment {
+    id: string
     content: string
-    likes: number
+    user_id: string
+    post_id: string
+    created_at: string
+    user?: ApiUser
+}
+
+export interface ApiPost {
+    id: string
+    text: string
+    image?: string | null
+    like_count: number
+    created_at: string
+    user_id: string
+    user?: ApiUser
+    comments?: ApiComment[]
 }
 
 export interface Post {
@@ -16,92 +31,67 @@ export interface Post {
     initials: string
     avatarColor: string
     timeAgo: string
-    category: PostCategory
-    title: string
-    content: string
+    text: string
+    image?: string | null
     likes: number
-    comments: number
-    shares: number
+    commentsCount: number
     liked: boolean
-    mockComments: Comment[]
+    comments: Comment[]
 }
 
-export const CATEGORY_BADGE: Record<PostCategory, { label: string; bg: string; color: string }> = {
-    Workout:   { label: "Workout",   bg: "#dbeafe", color: "#1d4ed8" },
-    Nutrition: { label: "Nutrition", bg: "#dcfce7", color: "#15803d" },
-    Milestone: { label: "Milestone", bg: "#fef9c3", color: "#a16207" },
+export interface Comment {
+    id: string
+    author: string
+    initials: string
+    avatarColor: string
+    timeAgo: string
+    content: string
 }
 
-export const MOCK_POSTS: Post[] = [
-    {
-        id: "1",
-        author: "Audrey Meyer",
-        initials: "A",
-        avatarColor: "#6366f1",
-        timeAgo: "2h ago",
-        category: "Workout",
-        title: "Just hit a new deadlift PR! 🎉",
-        content: "After 6 months of consistent training, I finally pulled 140kg today! Consistency is everything 👊",
-        likes: 142,
-        comments: 24,
-        shares: 8,
-        liked: false,
-        mockComments: [
-            { id: "c1", author: "Margaud Fischer", initials: "M", avatarColor: "#10b981", timeAgo: "1h ago", content: "Incredible work Audrey! That's a massive jump 🔥", likes: 12 },
-            { id: "c2", author: "Thomas Reyes", initials: "T", avatarColor: "#ef4444", timeAgo: "45min ago", content: "Beast mode! 💪 Keep it up!", likes: 7 },
-            { id: "c3", author: "Sophie Laurent", initials: "S", avatarColor: "#f59e0b", timeAgo: "30min ago", content: "Wow, tu es une inspiration !", likes: 4 },
-        ],
-    },
-    {
-        id: "2",
-        author: "Marcus Webb",
-        initials: "M",
-        avatarColor: "#10b981",
-        timeAgo: "4h ago",
-        category: "Nutrition",
-        title: "Meal prep Sunday done right 🥗",
-        content: "6 days of high-protein lunches ready — simple and effective.",
-        likes: 89,
-        comments: 12,
-        shares: 5,
-        liked: false,
-        mockComments: [
-            { id: "c1", author: "Audrey Meyer", initials: "A", avatarColor: "#6366f1", timeAgo: "3h ago", content: "Je veux la recette ! 😍", likes: 8 },
-            { id: "c2", author: "Sophie Laurent", initials: "S", avatarColor: "#f59e0b", timeAgo: "2h ago", content: "Quelle organisation, bravo !", likes: 3 },
-        ],
-    },
-    {
-        id: "3",
-        author: "Sophie Laurent",
-        initials: "S",
-        avatarColor: "#f59e0b",
-        timeAgo: "6h ago",
-        category: "Milestone",
-        title: "30 jours sans sucre raffiné 🏆",
-        content: "Un mois de discipline, plus d'énergie, meilleur sommeil. Je continue !",
-        likes: 203,
-        comments: 41,
-        shares: 17,
-        liked: true,
-        mockComments: [
-            { id: "c1", author: "Marcus Webb", initials: "M", avatarColor: "#10b981", timeAgo: "5h ago", content: "Incroyable ! Je vais essayer aussi 🙌", likes: 15 },
-        ],
-    },
-    {
-        id: "4",
-        author: "Thomas Reyes",
-        initials: "T",
-        avatarColor: "#ef4444",
-        timeAgo: "1j ago",
-        category: "Workout",
-        title: "5km en 22 minutes ce matin 🏃",
-        content: "Nouveau record personnel ! Objectif suivant : 20 minutes avant fin du mois.",
-        likes: 67,
-        comments: 9,
-        shares: 3,
-        liked: false,
-        mockComments: [
-            { id: "c1", author: "Audrey Meyer", initials: "A", avatarColor: "#6366f1", timeAgo: "20h ago", content: "Trop fort ! 🔥", likes: 5 },
-        ],
-    },
-]
+const COLORS = ["#6366f1","#10b981","#f59e0b","#ef4444","#3b82f6","#8b5cf6","#ec4899"]
+
+function colorFromId(id: string): string {
+    let sum = 0
+    for (const c of id) sum += c.charCodeAt(0)
+    return COLORS[sum % COLORS.length]
+}
+
+function timeAgo(dateStr: string): string {
+    const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000)
+    if (diff < 60) return "À l'instant"
+    if (diff < 3600) return `${Math.floor(diff / 60)}min ago`
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
+    return `${Math.floor(diff / 86400)}j ago`
+}
+
+export function toPost(p: ApiPost, likedIds: Set<string>): Post {
+    const name = p.user ? `${p.user.first_name} ${p.user.last_name}` : "Utilisateur"
+    const initials = p.user
+        ? `${p.user.first_name?.[0] ?? ""}${p.user.last_name?.[0] ?? ""}`.toUpperCase()
+        : "?"
+    return {
+        id: p.id,
+        author: name,
+        initials,
+        avatarColor: colorFromId(p.user_id),
+        timeAgo: timeAgo(p.created_at),
+        text: p.text,
+        image: p.image,
+        likes: p.like_count,
+        commentsCount: p.comments?.length ?? 0,
+        liked: likedIds.has(p.id),
+        comments: (p.comments ?? []).map(c => toComment(c)),
+    }
+}
+
+export function toComment(c: ApiComment): Comment {
+    const name = c.user ? `${c.user.first_name} ${c.user.last_name}` : "Utilisateur"
+    return {
+        id: c.id,
+        author: name,
+        initials: c.user ? `${c.user.first_name?.[0] ?? ""}${c.user.last_name?.[0] ?? ""}`.toUpperCase() : "?",
+        avatarColor: colorFromId(c.user_id),
+        timeAgo: timeAgo(c.created_at),
+        content: c.content,
+    }
+}
