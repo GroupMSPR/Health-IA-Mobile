@@ -1,0 +1,65 @@
+# ============================================================================
+#  CI — Mobile (React Native / Expo)
+# ============================================================================
+
+name: CI - Mobile (React Native / Expo)
+
+on:
+  push:
+    branches: ["master", "develop"]
+  pull_request:
+    branches: ["master", "develop"]
+
+jobs:
+  lint-and-typecheck:
+    name: Lint & TypeScript check
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+
+      - name: TypeScript check
+        run: npx tsc --noEmit
+
+      - name: ESLint
+        run: npx expo lint
+
+  test:
+    name: Tests & Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+
+      - name: Run tests with coverage
+        run: npm test -- --coverage --ci --runInBand
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 7
