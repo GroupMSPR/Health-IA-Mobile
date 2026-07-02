@@ -1,4 +1,4 @@
-import { View, Text, ScrollView } from "react-native"
+import { View, Text, ScrollView, Pressable } from "react-native"
 import { FullHeader } from "../../assets/componants/header"
 import DashboardInfoSquared from "../../assets/componants/dashboardInfoSquare"
 import ExerciceVignet from "../../assets/componants/exerciceVignet"
@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import { LineChart } from "react-native-gifted-charts";
 import api from "../../lib/api"
 import { useAuth } from "../../context/authContext"
+import { router } from "expo-router"
 
 interface HealthMetric {
     id: string;
@@ -34,6 +35,7 @@ const Home = () => {
     const [open, setOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(true);
     const [isRecomendationLoading, setIsRecomendationLoading] = useState(true)
+    const [hasTodayMetric, setHasTodayMetric] = useState(true)
 
     const [recommendations, setRecommendations] = useState<Exercise[]>([]);
 
@@ -201,7 +203,7 @@ const Home = () => {
 
         const fetchData = async () => {
             try {
-
+                console.log("1")
                 const userRes = await api.post('/api/users/search', {
                     search: {
                         filters: [{ field: 'id', operator: '=', value: user.id }],
@@ -212,7 +214,7 @@ const Home = () => {
                 fetchRecommendations()
 
                 const currentUserData = userRes.data?.data?.[0] || userRes.data?.[0];
-
+console.log("2")
                 const sevenDaysAgo = new Date();
                 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
                 const pastDateString = sevenDaysAgo.toISOString().split('T')[0];
@@ -230,8 +232,12 @@ const Home = () => {
                 });
 
                 const data: HealthMetric[] = response.data?.data || response.data || [];
-
+console.log("3")
                 // Vérifier si on a un bilan pour aujourd'hui
+                const todayString = new Date().toISOString().split('T')[0];
+                const todayMetricExists = data.some(m => m.date.startsWith(todayString));
+                console.log(hasTodayMetric)
+                setHasTodayMetric(todayMetricExists);
 
                 // Préparer les tableaux pour les 7 derniers jours
                 const last7Days = [...Array(7)].map((_, i) => {
@@ -265,7 +271,7 @@ const Home = () => {
                     label: dayNames[i],
                 }));
 
-                console.log(calData, stpData, dayNames)
+
 
                 // Calcul des totaux
                 const totalCal = calData.reduce((a, b) => a + b, 0);
@@ -326,10 +332,10 @@ const Home = () => {
     }, [user]);
 
     const stats = [
-        { id: 1, name: 'Minutes actives (7j)', value: weeklyData.totalMinutes.toString(), change: weeklyData.minChange.text, changeType: weeklyData.minChange.type, icon: "#00f", bgColor: 'bg-blue-50' },
-        { id: 2, name: 'Calories brûlées (7j)', value: weeklyData.totalCalories.toLocaleString('fr-FR'), change: weeklyData.calChange.text, changeType: weeklyData.calChange.type, icon: "#f00", bgColor: 'bg-orange-50' },
-        { id: 3, name: 'Pas cumulés (7j)', value: weeklyData.totalSteps.toLocaleString('fr-FR'), change: weeklyData.stepChange.text, changeType: weeklyData.stepChange.type, icon: "#a500a5", bgColor: 'bg-purple-50' },
-        { id: 4, name: 'Poids actuel', value: weeklyData.latestWeight ? `${weeklyData.latestWeight}` : '--', change: weeklyData.weightChange.text, changeType: weeklyData.weightChange.type, icon: "#0f0", bgColor: 'bg-emerald-50' },
+        { id: 1, name: 'Active minutes (7d)', value: weeklyData.totalMinutes.toString(), change: weeklyData.minChange.text, changeType: weeklyData.minChange.type, icon: "#00f", bgColor: 'bg-blue-50' },
+        { id: 2, name: 'Calories burnt (7d)', value: weeklyData.totalCalories.toLocaleString('fr-FR'), change: weeklyData.calChange.text, changeType: weeklyData.calChange.type, icon: "#f00", bgColor: 'bg-orange-50' },
+        { id: 3, name: 'Total steps (7d)', value: weeklyData.totalSteps.toLocaleString('fr-FR'), change: weeklyData.stepChange.text, changeType: weeklyData.stepChange.type, icon: "#a500a5", bgColor: 'bg-purple-50' },
+        { id: 4, name: 'Current weight', value: weeklyData.latestWeight ? `${weeklyData.latestWeight}` : '--', change: weeklyData.weightChange.text, changeType: weeklyData.weightChange.type, icon: "#0f0", bgColor: 'bg-emerald-50' },
     ];
 
 
@@ -342,6 +348,70 @@ const Home = () => {
                     <Text style={{ fontWeight: 'bold', fontSize: 22 }}>Welcome back, {user?.first_name}</Text>
                     <Text>Here's your fitness summary for today</Text>
                 </View>
+                {!hasTodayMetric ? (
+                    <View
+                        style={{
+                            marginHorizontal: 8,
+                            marginVertical: 10,
+                            padding: 14,
+                            borderRadius: 16,
+                            backgroundColor: "#ffffff",
+                            borderWidth: 1,
+                            borderColor: "#E5E7EB",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            shadowColor: "#000",
+                            shadowOpacity: 0.05,
+                            shadowRadius: 6,
+                            shadowOffset: { width: 0, height: 2 },
+                            elevation: 2,
+                        }}
+                    >
+                        <View style={{ flex: 1, paddingRight: 10 }}>
+                            <Text
+                                style={{
+                                    fontSize: 16,
+                                    fontWeight: "700",
+                                    color: "#111827",
+                                }}
+                            >
+                                No health metric today
+                            </Text>
+
+                            <Text
+                                style={{
+                                    fontSize: 13,
+                                    color: "#6B7280",
+                                    marginTop: 2,
+                                }}
+                            >
+                                Create one to track your daily progress
+                            </Text>
+                        </View>
+
+                        <Pressable
+                            onPress={() => router.push("/(tabs)/healthMetric/create")}
+                            style={{
+                                backgroundColor: "#111827",
+                                paddingVertical: 10,
+                                paddingHorizontal: 14,
+                                borderRadius: 12,
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    color: "#fff",
+                                    fontWeight: "600",
+                                    fontSize: 13,
+                                }}
+                            >
+                                Create
+                            </Text>
+                        </Pressable>
+                    </View>
+                ) : null}
+
 
                 <View style={{ flexDirection: 'column', alignContent: 'center', padding: 5 }}>
                     <View style={{ flexDirection: 'row' }}>

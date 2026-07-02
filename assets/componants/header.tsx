@@ -1,11 +1,19 @@
 import { View, Text, Image, Animated, Dimensions, Pressable } from "react-native"
 import { router } from "expo-router";
+import * as SecureStore from 'expo-secure-store';
+import api from "../../lib/api";
 
 const NavigatorHeader = ({
     setOpen
 }: {
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+    const disconect = () => {
+        api.post("/api/logout")
+        SecureStore.setItemAsync('auth_token', '');
+        router.replace("/(auth)/login")
+    }
+
     return (
         <View style={{
             flexDirection: 'row',
@@ -19,7 +27,11 @@ const NavigatorHeader = ({
             <Text style={{ fontSize: 18, fontWeight: "600" }}>
                 Health AI Coach
             </Text>
-
+            <Pressable onPress={ disconect }>
+                <Text>
+                    Disconnect
+                </Text>
+            </Pressable>
             <Pressable onPress={() => setOpen(true)}>
                 <Image
                     source={require('../../assets/images/menu.png')}

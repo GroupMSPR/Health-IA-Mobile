@@ -9,12 +9,8 @@ import { useAuth } from "../../../context/authContext"
 import { MOCK_POSTS, CATEGORY_BADGE, type Post } from "./data"
 import { FullHeader } from "../../../assets/componants/header"
 
-type FilterTab = "All" | "Workouts" | "Nutrition" | "Milestones"
-const TABS: FilterTab[] = ["All", "Workouts", "Nutrition", "Milestones"]
-
 export default function Feed() {
     const { user } = useAuth()
-    const [activeTab, setActiveTab] = useState<FilterTab>("All")
     const [search, setSearch] = useState("")
     const [posts, setPosts] = useState<Post[]>(MOCK_POSTS)
     const [open, setOpen] = useState(false)
@@ -31,17 +27,12 @@ export default function Feed() {
     }
 
     const filtered = posts.filter(p => {
-        const matchTab =
-            activeTab === "All" ||
-            (activeTab === "Workouts"   && p.category === "Workout") ||
-            (activeTab === "Nutrition"  && p.category === "Nutrition") ||
-            (activeTab === "Milestones" && p.category === "Milestone")
         const matchSearch =
             search === "" ||
             p.title.toLowerCase().includes(search.toLowerCase()) ||
             p.content.toLowerCase().includes(search.toLowerCase()) ||
             p.author.toLowerCase().includes(search.toLowerCase())
-        return matchTab && matchSearch
+        return matchSearch
     })
 
     return (
@@ -83,30 +74,13 @@ export default function Feed() {
                     />
                 </View>
 
-                {/* Filter tabs */}
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabsScroll}>
-                    <View style={styles.tabsRow}>
-                        {TABS.map(tab => (
-                            <Pressable
-                                key={tab}
-                                style={[styles.tab, activeTab === tab && styles.tabActive]}
-                                onPress={() => setActiveTab(tab)}
-                            >
-                                <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
-                                    {tab}
-                                </Text>
-                            </Pressable>
-                        ))}
-                    </View>
-                </ScrollView>
-
                 {/* Posts */}
                 <View style={styles.postsList}>
                     {filtered.length === 0 ? (
                         <Text style={styles.empty}>Aucun post trouvé</Text>
                     ) : (
                         filtered.map(post => {
-                            const badge = CATEGORY_BADGE[post.category]
+                            
                             return (
                                 <Pressable
                                     key={post.id}
@@ -120,11 +94,6 @@ export default function Feed() {
                                         <View style={styles.postMeta}>
                                             <Text style={styles.postAuthor}>{post.author}</Text>
                                             <Text style={styles.postTime}>{post.timeAgo}</Text>
-                                        </View>
-                                        <View style={[styles.badge, { backgroundColor: badge.bg }]}>
-                                            <Text style={[styles.badgeText, { color: badge.color }]}>
-                                                {badge.label}
-                                            </Text>
                                         </View>
                                     </View>
 

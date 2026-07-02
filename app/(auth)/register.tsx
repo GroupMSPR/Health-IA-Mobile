@@ -47,8 +47,8 @@ export default function RegisterScreen() {
           <Text style={styles.logoText}>Health AI Coach</Text>
         </View>
         <View style={styles.heroSection}>
-          <Text style={styles.heroTitle}>Créer un compte</Text>
-          <Text style={styles.heroSubtitle}>Votre profil de santé personnalisé.</Text>
+          <Text style={styles.heroTitle}>Create an account</Text>
+          <Text style={styles.heroSubtitle}>Your personalised health profil </Text>
         </View>
       </View>
       <View style={styles.formCard}>
@@ -56,15 +56,15 @@ export default function RegisterScreen() {
           <View style={styles.errorAlert} accessible={true} accessibilityRole="alert" accessibilityLiveRegion="assertive">
             <Text style={styles.errorText}>{globalError}</Text>
           </View>}
-        <Text style={styles.sectionTitle}>Identité & Connexion</Text>
+        <Text style={styles.sectionTitle}>Identity and Connection</Text>
         <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Prénom</Text>
+          <Text style={styles.label}>First Name</Text>
           <TextInput style={[styles.input, errors.first_name && styles.inputError]} placeholder="Jean" placeholderTextColor={colors.slate600} value={formData.first_name} onChangeText={(val) => handleChange('first_name', val)} editable={!loading} />
           {errors.first_name &&
             <Text style={styles.fieldError}>{errors.first_name[0]}</Text>}
         </View>
         <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Nom</Text>
+          <Text style={styles.label}>Family Name</Text>
           <TextInput style={[styles.input, errors.last_name && styles.inputError]} placeholder="Dupont" placeholderTextColor={colors.slate600} value={formData.last_name} onChangeText={(val) => handleChange('last_name', val)} editable={!loading} />
           {errors.last_name &&
             <Text style={styles.fieldError}>{errors.last_name[0]}</Text>}
@@ -75,18 +75,18 @@ export default function RegisterScreen() {
           {errors.email &&
             <Text style={styles.fieldError}>{errors.email[0]}</Text>}
         </View><View style={styles.fieldContainer}>
-          <Text style={styles.label}>Mot de passe</Text>
+          <Text style={styles.label}>Password</Text>
           <TextInput style={[styles.input, errors.password && styles.inputError]} placeholder="••••••••" placeholderTextColor={colors.slate600} value={formData.password} onChangeText={(val) => handleChange('password', val)} secureTextEntry editable={!loading} />
           {errors.password &&
             <Text style={styles.fieldError}>{errors.password[0]}</Text>}
         </View>
         <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Confirmer le mot de passe</Text>
+          <Text style={styles.label}>Confirm Password</Text>
           <TextInput style={[styles.input, errors.password_confirmation && styles.inputError]} placeholder="••••••••" placeholderTextColor={colors.slate600} value={formData.password_confirmation} onChangeText={(val) => handleChange('password_confirmation', val)} secureTextEntry editable={!loading} />
           {errors.password_confirmation &&
             <Text style={styles.fieldError}>{errors.password_confirmation[0]}</Text>}
         </View>
-        <Text style={styles.sectionTitle}>Métriques de santé</Text>
+        <Text style={styles.sectionTitle}>Health Metric</Text>
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Date de naissance</Text>
           <TextInput style={[styles.input, errors.birthdate && styles.inputError]} placeholder="YYYY-MM-DD" placeholderTextColor={colors.slate600} value={formData.birthdate} onChangeText={(val) => handleChange('birthdate', val)} editable={!loading} />

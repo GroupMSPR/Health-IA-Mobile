@@ -144,11 +144,11 @@ export default function ExerciseDetailScreen() {
                 <View style={styles.header}>
                     <Text style={styles.title}>{isLoading
                         ? "loading"
-                        : exercise?.name ?? "error getting the name"}
+                        : exercise?.name ?? "error"}
                     </Text>
                     <Text style={styles.category}>{isLoading
                         ? "loading"
-                        : exercise?.category ?? "error getting the category"}
+                        : exercise?.category ?? "error"}
                     </Text>
                 </View>
 
@@ -161,7 +161,7 @@ export default function ExerciseDetailScreen() {
                         label="Difficulty"
                         value={isLoading
                             ? "loading"
-                            : exercise?.difficulty_level ?? "error getting the difficulty level"}
+                            : exercise?.difficulty_level ?? "error"}
                         color={
                             exercise?.difficulty_level
                                 ? difficultyColors[exercise?.difficulty_level] ?? "#6B7280"
@@ -184,7 +184,7 @@ export default function ExerciseDetailScreen() {
                             ? "loading"
                             : exercise?.recommended_duration_seconds != null
                                 ? `${Math.floor(exercise.recommended_duration_seconds / 60)} min`
-                                : "error getting the duration"}
+                                : "error"}
                     />
 
                     <InfoRow
@@ -194,7 +194,7 @@ export default function ExerciseDetailScreen() {
                             ? "loading"
                             : exercise?.recommended_rest_minutes != null
                                 ? `${exercise.recommended_rest_minutes} min`
-                                : "error getting rest time"}
+                                : "error"}
                     />
 
                     <InfoRow
@@ -204,7 +204,7 @@ export default function ExerciseDetailScreen() {
                             ? "loading"
                             : exercise?.estimated_calories_per_minutes != null
                                 ? `${exercise.estimated_calories_per_minutes} kcal`
-                                : "error getting calories"}
+                                : "error"}
                         color="#EA580C"
                     />
 
@@ -213,7 +213,7 @@ export default function ExerciseDetailScreen() {
                         label="Injury Risk"
                         value={isLoading
                             ? "loading"
-                            : exercise?.injury_risk_level ?? "error getting injury risk level"}
+                            : exercise?.injury_risk_level ?? "error"}
                         color={
                             exercise?.injury_risk_level ? injuryColors[exercise?.injury_risk_level] ?? "#6B7280" : "#6B7280"
                         }
@@ -227,7 +227,7 @@ export default function ExerciseDetailScreen() {
                     <Text style={styles.instructions}>
                         {isLoading
                             ? "loading"
-                            : exercise?.instructions ?? "error getting instruction"}
+                            : exercise?.instructions ?? "error"}
                     </Text>
                 </View>
 

@@ -26,8 +26,6 @@ export default function PostDetail() {
         )
     }
 
-    const badge = CATEGORY_BADGE[post.category]
-
     const handleLike = () => {
         setLiked(prev => !prev)
         setLikesCount(prev => liked ? prev - 1 : prev + 1)
@@ -76,9 +74,6 @@ export default function PostDetail() {
                         <View style={styles.postMeta}>
                             <Text style={styles.postAuthor}>{post.author}</Text>
                             <Text style={styles.postTime}>{post.timeAgo}</Text>
-                        </View>
-                        <View style={[styles.badge, { backgroundColor: badge.bg }]}>
-                            <Text style={[styles.badgeText, { color: badge.color }]}>{badge.label}</Text>
                         </View>
                     </View>
 
